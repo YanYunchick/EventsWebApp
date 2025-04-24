@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EventsWebApp.Domain.Contracts;
+using EventsWebApp.Infrastructure.Repository.Repositories;
 
 namespace EventsWebApp.Infrastructure.Repository;
 

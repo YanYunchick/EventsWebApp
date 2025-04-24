@@ -1,0 +1,94 @@
+﻿using System.Text.Json;
+using EventsWebApp.Application.Contracts;
+using EventsWebApp.Application.DTOs.Event;
+using EventsWebApp.Domain.RequestFeatures;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace EventsWebApp.WebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EventsController : ControllerBase
+    {
+        private readonly IServiceManager _service;
+
+        public EventsController(IServiceManager service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEvents([FromQuery] EventParameters eventParameters, CancellationToken cancellationToken)
+        {
+            var result = await _service.EventService
+                .GetAllEventAsync(eventParameters, trackChanges: false, cancellationToken);
+
+            Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(result.metaData));
+
+            return Ok(result.events);
+        }
+
+        [HttpGet("{id:guid}", Name = "EventById")]
+        public async Task<IActionResult> GetUserTask(Guid id, CancellationToken cancellationToken)
+        {
+            var eventDto = await _service.EventService.GetEventByIdAsync(id, trackChanges: false, cancellationToken);
+            return Ok(eventDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent([FromBody] EventForCreationDto eventDto,
+        CancellationToken cancellationToken)
+        {
+            var createdEvent = await _service.EventService.CreateEventAsync(eventDto, cancellationToken);
+            return CreatedAtRoute("EventById", new { id = createdEvent.Id }, createdEvent);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteEvent(Guid id, CancellationToken cancellationToken)
+        {
+            await _service.EventService.DeleteImageAsync(id, trackChanges: false, cancellationToken);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateEvent(
+            Guid id, 
+            [FromBody] EventForUpdateDto eventDto,
+            CancellationToken cancellationToken)
+        {
+            await _service.EventService.UpdateUserTaskAsync(id, eventDto, trackChanges: true, cancellationToken);
+            return NoContent();
+        }
+
+        public class FileUploadRequest
+        {
+            public IFormFile? File { get; set; }
+        }
+        [HttpPost("{id:guid}/image")] 
+        public async Task<IActionResult> UploadEventImage(Guid id, [FromForm] FileUploadRequest model, CancellationToken cancellationToken)
+        {
+            await _service.EventService.UploadImageAsync(id, trackChanges: true, model.File, cancellationToken);
+            return NoContent();
+        }
+
+        [HttpDelete("{id:guid}/image")]
+        public async Task<IActionResult> DeleteEventImage(Guid id, CancellationToken cancellationToken)
+        {
+            await _service.EventService.DeleteImageAsync(id, trackChanges: true, cancellationToken);
+            return NoContent();
+        }
+
+        [HttpGet("{id:guid}/image")]
+        public async Task<IActionResult> GetEventImage(Guid id, CancellationToken cancellationToken)
+        {
+            var image = await _service.EventService.GetImageAsync(id, trackChanges: false, cancellationToken);
+
+            return File(
+                image.fileBytes,
+                image.contentType,
+                image.filename);
+        }
+    }
+}

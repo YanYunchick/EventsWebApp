@@ -3,17 +3,141 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using AutoMapper;
 using EventsWebApp.Application.Contracts;
+using EventsWebApp.Application.DTOs.Event;
 using EventsWebApp.Domain.Contracts;
+using EventsWebApp.Domain.Exceptions;
+using EventsWebApp.Domain.Models;
+using EventsWebApp.Domain.RequestFeatures;
+using Microsoft.AspNetCore.Http;
 
 namespace EventsWebApp.Application.Service;
 
 internal sealed class EventService : IEventService
 {
     private readonly IRepositoryManager _repository;
+    private readonly IMapper _mapper;
+    private readonly IFileService _fileService;
 
-    public EventService(IRepositoryManager repository)
+    public EventService(IRepositoryManager repository, IMapper mapper, IFileService fileService)
     {
         _repository = repository;
+        _mapper = mapper;
+        _fileService = fileService;
+    }
+
+    public async Task<(IEnumerable<EventDto> events, MetaData metaData)> GetAllEventAsync(
+        EventParameters eventParameters, bool trackChanges, CancellationToken cancellationToken)
+    {
+        var eventsWithMetaData = await _repository.Event
+            .GetAllEventsAsync(eventParameters, trackChanges, cancellationToken);
+
+        var eventsDto = _mapper.Map<IEnumerable<EventDto>>(eventsWithMetaData);
+        return (
+            events: eventsDto,
+            metaData: eventsWithMetaData.MetaData);
+    }
+
+    public async Task<EventDto> GetEventByIdAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken)
+    {
+        var eventEntity = await _repository.Event.GetEventByIdAsync(eventId, trackChanges, cancellationToken);
+        if (eventEntity is null)
+            throw new EventByIdNotFoundException(eventId);
+
+        var eventDto = _mapper.Map<EventDto>(eventEntity);
+        return eventDto;
+    }
+
+    public async Task<EventDto> GetEventByNameAsync(string name, bool trackChanges, CancellationToken cancellationToken)
+    {
+        var eventEntity = await _repository.Event.GetEventByNameAsync(name, trackChanges, cancellationToken);
+        if (eventEntity is null)
+            throw new EventByNameNotFoundException(name);
+
+        var eventDto = _mapper.Map<EventDto>(eventEntity);
+        return eventDto;
+    }
+
+    public async Task<EventDto> CreateEventAsync(EventForCreationDto eventDto, CancellationToken cancellationToken)
+    {
+        var eventEntity = _mapper.Map<Event>(eventDto);
+
+        _repository.Event.CreateEvent(eventEntity);
+        await _repository.SaveAsync(cancellationToken);
+
+        var eventToReturn = _mapper.Map<EventDto>(eventEntity);
+        return eventToReturn;
+    }
+
+    public async Task DeleteUserTaskAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken)
+    {
+        var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+
+        _repository.Event.DeleteEvent(eventEntity);
+        await _repository.SaveAsync(cancellationToken);
+
+        _fileService.DeleteFile(eventEntity.ImagePath!);
+    }
+
+    public async Task UpdateUserTaskAsync(
+        Guid eventId, 
+        EventForUpdateDto eventForUpdateDto,
+        bool trackChanges, 
+        CancellationToken cancellationToken)
+    {
+        var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+
+        _mapper.Map(eventForUpdateDto, eventEntity);
+
+        await _repository.SaveAsync(cancellationToken);
+    }
+
+    private async Task<Event> GetEventAndCheckIfItExists(Guid id, bool trackChanges, CancellationToken cancellationToken)
+    {
+        var userTask = await _repository.Event.GetEventByIdAsync(id, trackChanges, cancellationToken);
+        if (userTask is null)
+            throw new EventByIdNotFoundException(id);
+        return userTask;
+    }
+
+    public async Task UploadImageAsync(
+        Guid eventId, 
+        bool trackChanges, 
+        IFormFile imageFile, 
+        CancellationToken cancellationToken)
+    {
+        if (imageFile?.Length > 1 * 1024 * 1024)
+        {
+            throw new HugeFileBadRequestException("1 MB");
+        }
+
+        var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+
+        string[] allowedFileExtentions = [".jpg", ".jpeg", ".png"];
+        var fileName = await _fileService.SaveFileAsync(imageFile!, allowedFileExtentions);
+
+        eventEntity.ImagePath = fileName;
+        await _repository.SaveAsync(cancellationToken);
+    }
+
+    public async Task DeleteImageAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken)
+    {
+        var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+        _fileService.DeleteFile(eventEntity.ImagePath!);
+
+        eventEntity.ImagePath = string.Empty;
+        await _repository.SaveAsync(cancellationToken);
+    }
+
+    public async Task<(byte[] fileBytes, string contentType, string filename)> GetImageAsync(
+        Guid eventId, bool trackChanges, CancellationToken cancellationToken)
+    {
+        var imageEvent = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+
+        var (fileBytes, contentType, filename) = await _fileService.GetFileAsync(imageEvent.ImagePath!);
+
+        return (fileBytes, contentType, filename);
     }
 }

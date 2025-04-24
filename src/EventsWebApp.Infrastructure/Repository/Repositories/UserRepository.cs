@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Domain.Models;
 
-namespace EventsWebApp.Infrastructure.Repository;
+namespace EventsWebApp.Infrastructure.Repository.Repositories;
 
-public class EventRepository : RepositoryBase<Event>, IEventRepository
+public class UserRepository : RepositoryBase<User>, IUserRepository
 {
-    public EventRepository(RepositoryContext repositoryContext) 
+    public UserRepository(RepositoryContext repositoryContext)
         : base(repositoryContext)
     {
     }
-
-
 }

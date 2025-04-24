@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -15,10 +15,6 @@
     <ProjectReference Include="..\EventsWebApp.Domain\EventsWebApp.Domain.csproj" />
     <ProjectReference Include="..\EventsWebApp.Application\EventsWebApp.Application.csproj" />
     <ProjectReference Include="..\EventsWebApp.Infrastructure\EventsWebApp.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
