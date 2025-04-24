@@ -32,7 +32,7 @@ public static class RepositoryEventExtensions
         {
             events = events.Where(e => e.Category == category);
         }
-        if (!location.IsNullOrEmpty())
+        if (!string.IsNullOrEmpty(location))
         {
             events = events.Where(e => e.Location!.ToLower().Contains(location!.Trim().ToLower()));
         }

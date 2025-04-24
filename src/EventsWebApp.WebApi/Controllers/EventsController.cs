@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using EventsWebApp.Application.Contracts;
 using EventsWebApp.Application.DTOs.Event;
+using EventsWebApp.Application.DTOs.File;
 using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,6 +21,7 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetEvents([FromQuery] EventParameters eventParameters, CancellationToken cancellationToken)
         {
             var result = await _service.EventService
@@ -62,12 +64,8 @@ namespace EventsWebApp.WebApi.Controllers
             return NoContent();
         }
 
-        public class FileUploadRequest
-        {
-            public IFormFile? File { get; set; }
-        }
         [HttpPost("{id:guid}/image")] 
-        public async Task<IActionResult> UploadEventImage(Guid id, [FromForm] FileUploadRequest model, CancellationToken cancellationToken)
+        public async Task<IActionResult> UploadEventImage(Guid id, [FromForm] FileUploadDto model, CancellationToken cancellationToken)
         {
             await _service.EventService.UploadImageAsync(id, trackChanges: true, model.File, cancellationToken);
             return NoContent();

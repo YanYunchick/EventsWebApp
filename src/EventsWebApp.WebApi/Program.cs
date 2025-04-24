@@ -13,6 +13,10 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddTransient<IFileService, FileService>();
 
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentity();
+builder.Services.ConfigureJWT(builder.Configuration);
+
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 

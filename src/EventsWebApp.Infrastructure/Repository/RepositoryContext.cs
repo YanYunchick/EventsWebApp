@@ -30,5 +30,6 @@ public class RepositoryContext : IdentityDbContext<User>
         modelBuilder.ApplyConfiguration(new EventConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new UserEventConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
     }
 }
