@@ -19,9 +19,9 @@ public interface IEventService
     Task<EventDto> GetEventByIdAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken);
     Task<EventDto> GetEventByNameAsync(string name, bool trackChanges, CancellationToken cancellationToken);
     Task<EventDto> CreateEventAsync(EventForCreationDto eventDto, CancellationToken cancellationToken);
-    Task DeleteUserTaskAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken);
+    Task DeleteEventAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken);
 
-    Task UpdateUserTaskAsync(
+    Task UpdateEventAsync(
         Guid eventId,
         EventForUpdateDto eventForUpdateDto,
         bool trackChanges,

@@ -8,8 +8,8 @@ namespace EventsWebApp.Domain.Exceptions;
 
 public sealed class FileNotFoundException : NotFoundException
 {
-    public FileNotFoundException(string path)
-        : base($"File not found by path: {path}")
+    public FileNotFoundException(string message)
+        : base($"File not found: {message}")
     {
     }
 }

@@ -50,7 +50,7 @@ namespace EventsWebApp.WebApi.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteEvent(Guid id, CancellationToken cancellationToken)
         {
-            await _service.EventService.DeleteImageAsync(id, trackChanges: false, cancellationToken);
+            await _service.EventService.DeleteEventAsync(id, trackChanges: false, cancellationToken);
             return NoContent();
         }
 
@@ -60,7 +60,7 @@ namespace EventsWebApp.WebApi.Controllers
             [FromBody] EventForUpdateDto eventDto,
             CancellationToken cancellationToken)
         {
-            await _service.EventService.UpdateUserTaskAsync(id, eventDto, trackChanges: true, cancellationToken);
+            await _service.EventService.UpdateEventAsync(id, eventDto, trackChanges: true, cancellationToken);
             return NoContent();
         }
 

@@ -71,7 +71,7 @@ internal sealed class EventService : IEventService
         return eventToReturn;
     }
 
-    public async Task DeleteUserTaskAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken)
+    public async Task DeleteEventAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken)
     {
         var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
 
@@ -81,7 +81,7 @@ internal sealed class EventService : IEventService
         _fileService.DeleteFile(eventEntity.ImagePath!);
     }
 
-    public async Task UpdateUserTaskAsync(
+    public async Task UpdateEventAsync(
         Guid eventId, 
         EventForUpdateDto eventForUpdateDto,
         bool trackChanges, 
@@ -113,22 +113,58 @@ internal sealed class EventService : IEventService
             throw new HugeFileBadRequestException("1 MB");
         }
 
-        var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+        using var transaction = _repository.BeginTransaction();
 
-        string[] allowedFileExtentions = [".jpg", ".jpeg", ".png"];
-        var fileName = await _fileService.SaveFileAsync(imageFile!, allowedFileExtentions);
+        try
+        {
+            var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
 
-        eventEntity.ImagePath = fileName;
-        await _repository.SaveAsync(cancellationToken);
+            var oldFilePath = eventEntity.ImagePath;
+
+            string[] allowedFileExtentions = [".jpg", ".jpeg", ".png"];
+            var fileName = await _fileService.SaveFileAsync(imageFile!, allowedFileExtentions);
+
+            eventEntity.ImagePath = fileName;
+            await _repository.SaveAsync(cancellationToken);
+
+            if (!string.IsNullOrEmpty(oldFilePath))
+            {
+                _fileService.DeleteFile(oldFilePath);
+            }
+
+            await _repository.CommitTransactionAsync(transaction, cancellationToken);
+
+        }
+        catch (Exception)
+        {
+            await _repository.RollbackTransactionAsync(transaction, cancellationToken);
+
+            throw;
+        }
     }
 
     public async Task DeleteImageAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken)
     {
-        var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
-        _fileService.DeleteFile(eventEntity.ImagePath!);
+        using var transaction = _repository.BeginTransaction();
 
-        eventEntity.ImagePath = string.Empty;
-        await _repository.SaveAsync(cancellationToken);
+        try
+        {
+            var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+            var filePathToDelete = eventEntity.ImagePath;
+
+            eventEntity.ImagePath = string.Empty;
+            await _repository.SaveAsync(cancellationToken);
+
+            _fileService.DeleteFile(filePathToDelete!);
+
+            await _repository.CommitTransactionAsync(transaction, cancellationToken);
+        }
+        catch (Exception)
+        {
+            await _repository.RollbackTransactionAsync(transaction, cancellationToken);
+
+            throw;
+        }
     }
 
     public async Task<(byte[] fileBytes, string contentType, string filename)> GetImageAsync(

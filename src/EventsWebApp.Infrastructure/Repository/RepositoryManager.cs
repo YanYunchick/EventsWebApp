@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Infrastructure.Repository.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EventsWebApp.Infrastructure.Repository;
 
@@ -30,4 +31,13 @@ public class RepositoryManager : IRepositoryManager
 
     public async Task SaveAsync(CancellationToken cancellationToken) => 
         await _repositoryContext.SaveChangesAsync(cancellationToken);
+
+    public IDbContextTransaction BeginTransaction() =>
+        _repositoryContext.Database.BeginTransaction();
+
+    public async Task CommitTransactionAsync(IDbContextTransaction transaction, CancellationToken cancellationToken) =>
+        await transaction.CommitAsync(cancellationToken);
+
+    public async Task RollbackTransactionAsync(IDbContextTransaction transaction, CancellationToken cancellationToken) =>
+        await transaction.RollbackAsync(cancellationToken);
 }

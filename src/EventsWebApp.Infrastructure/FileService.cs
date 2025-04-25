@@ -50,14 +50,14 @@ public class FileService : IFileService
     {
         if (string.IsNullOrEmpty(fileNameWithExtension))
         {
-            throw new FileBadRequestException("File name is null or empty.");
+            throw new FileBadRequestException("File doesn't exist.");
         }
 
         var fileNameWithPath = Path.Combine(_filePath, fileNameWithExtension);
 
         if (!File.Exists(fileNameWithPath))
         {
-            throw new Domain.Exceptions.FileNotFoundException(fileNameWithPath);
+            throw new Domain.Exceptions.FileNotFoundException("File doesn't exist.");
         }
         File.Delete(fileNameWithPath);
     }
