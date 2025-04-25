@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EventsWebApp.Domain\EventsWebApp.Domain.csproj" />
     <ProjectReference Include="..\EventsWebApp.Application\EventsWebApp.Application.csproj" />
   </ItemGroup>
 

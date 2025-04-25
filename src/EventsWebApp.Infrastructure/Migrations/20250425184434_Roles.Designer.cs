@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsWebApp.Infrastructure.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20250424190716_Roles")]
+    [Migration("20250425184434_Roles")]
     partial class Roles
     {
         /// <inheritdoc />
@@ -197,12 +197,6 @@ namespace EventsWebApp.Infrastructure.Migrations
                     b.ToTable("AspNetRoles", (string)null);
 
                     b.HasData(
-                        new
-                        {
-                            Id = "3472791a-25b5-4804-ad2d-ad75ae671c57",
-                            Name = "Participant",
-                            NormalizedName = "PARTICIPANT"
-                        },
                         new
                         {
                             Id = "fd9e896e-29dd-4d9a-89dd-853f462ff988",

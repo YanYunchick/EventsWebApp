@@ -2,6 +2,7 @@ using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Infrastructure;
 using EventsWebApp.WebApi.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +17,10 @@ builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
+builder.Services.ConfigureAuthorizationPolicies();
 
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwaggerGen();
 
 var app = builder.Build();
 

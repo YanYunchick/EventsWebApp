@@ -52,7 +52,7 @@ public class EventRepository : RepositoryBase<Event>, IEventRepository
     {
         return await FindByCondition(e => e.Name.Equals(name), trackChanges)
                         .Include(e => e.UserEvents)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(cancellationToken);
     }
 
     public void CreateEvent(Event eventEntity) => Create(eventEntity);

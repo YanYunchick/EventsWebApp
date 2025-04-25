@@ -16,7 +16,7 @@ namespace EventsWebApp.Application.Service;
 public sealed class ServiceManager : IServiceManager
 {
     private readonly Lazy<IEventService> _eventService;
-    private readonly Lazy<IUserService> _userService;
+    private readonly Lazy<IParticipantUserService> _userService;
     private readonly Lazy<IAuthenticationService> _authenticationService;
 
     public ServiceManager(
@@ -27,13 +27,14 @@ public sealed class ServiceManager : IServiceManager
         IConfiguration configuration)
     {
         _eventService = new Lazy<IEventService>(() => new EventService(repositoryManager, mapper, fileService));
-        _userService = new Lazy<IUserService>(() => new UserService(repositoryManager, mapper));
+        _userService = new Lazy<IParticipantUserService>(() => 
+            new ParticipantUserService(repositoryManager, userManager, mapper));
         _authenticationService = new Lazy<IAuthenticationService>(() =>
             new AuthenticationService(mapper, userManager, configuration));
     }
 
     public IEventService EventService => _eventService.Value;
-    public IUserService UserService => _userService.Value;
+    public IParticipantUserService ParticipantUserService => _userService.Value;
     public IAuthenticationService AuthenticationService => _authenticationService.Value;
 
 }

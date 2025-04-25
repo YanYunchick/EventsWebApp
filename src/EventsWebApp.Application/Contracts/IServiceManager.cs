@@ -9,6 +9,6 @@ namespace EventsWebApp.Application.Contracts;
 public interface IServiceManager
 {
     IEventService EventService { get; }
-    IUserService UserService { get; }
+    IParticipantUserService ParticipantUserService { get; }
     IAuthenticationService AuthenticationService { get; }
 }

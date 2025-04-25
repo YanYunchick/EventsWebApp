@@ -196,12 +196,6 @@ namespace EventsWebApp.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3472791a-25b5-4804-ad2d-ad75ae671c57",
-                            Name = "Participant",
-                            NormalizedName = "PARTICIPANT"
-                        },
-                        new
-                        {
                             Id = "fd9e896e-29dd-4d9a-89dd-853f462ff988",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"

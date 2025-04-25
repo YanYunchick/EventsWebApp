@@ -17,7 +17,13 @@ public class MappingProfile : Profile
         CreateMap<Event, EventDto>();
         CreateMap<EventForCreationDto, Event>();
         CreateMap<EventForUpdateDto, Event>().ReverseMap();
+
         CreateMap<UserForRegistrationDto, User>();
+
+        CreateMap<User, ParticipantUserDto>()
+            .ForMember(destination => destination.RegistrationDate,
+                opts => opts
+                    .MapFrom(src => src.UserEvents.First().RegistrationDate));
 
     }
 }

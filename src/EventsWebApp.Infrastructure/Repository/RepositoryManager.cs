@@ -13,7 +13,8 @@ public class RepositoryManager : IRepositoryManager
 {
     private readonly RepositoryContext _repositoryContext;
     private readonly Lazy<IEventRepository> _eventRepository;
-    private readonly Lazy<IUserRepository> _userRepository;
+    private readonly Lazy<IParticipantUserRepository> _userRepository;
+    private readonly Lazy<IUserEventRepository> _userEventRepository;
 
     public RepositoryManager(RepositoryContext repositoryContext)
     {
@@ -22,12 +23,16 @@ public class RepositoryManager : IRepositoryManager
         _eventRepository = new Lazy<IEventRepository>(() => new
             EventRepository(repositoryContext));
 
-        _userRepository = new Lazy<IUserRepository>(() => new
-            UserRepository(repositoryContext));
+        _userRepository = new Lazy<IParticipantUserRepository>(() => new
+            ParticipantUserRepository(repositoryContext));
+        
+        _userEventRepository = new Lazy<IUserEventRepository>(() => new
+            UserEventRepository(repositoryContext));
     }
 
     public IEventRepository Event => _eventRepository.Value;
-    public IUserRepository User => _userRepository.Value;
+    public IParticipantUserRepository User => _userRepository.Value;
+    public IUserEventRepository UserEvent => _userEventRepository.Value;
 
     public async Task SaveAsync(CancellationToken cancellationToken) => 
         await _repositoryContext.SaveChangesAsync(cancellationToken);

@@ -21,7 +21,6 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetEvents([FromQuery] EventParameters eventParameters, CancellationToken cancellationToken)
         {
             var result = await _service.EventService
@@ -33,13 +32,14 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpGet("{id:guid}", Name = "EventById")]
-        public async Task<IActionResult> GetUserTask(Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetEvent(Guid id, CancellationToken cancellationToken)
         {
             var eventDto = await _service.EventService.GetEventByIdAsync(id, trackChanges: false, cancellationToken);
             return Ok(eventDto);
         }
 
         [HttpPost]
+        [Authorize(Policy = "AdministratorOnly")]
         public async Task<IActionResult> CreateEvent([FromBody] EventForCreationDto eventDto,
         CancellationToken cancellationToken)
         {
@@ -48,6 +48,7 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize(Policy = "AdministratorOnly")]
         public async Task<IActionResult> DeleteEvent(Guid id, CancellationToken cancellationToken)
         {
             await _service.EventService.DeleteEventAsync(id, trackChanges: false, cancellationToken);
@@ -55,6 +56,7 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize(Policy = "AdministratorOnly")]
         public async Task<IActionResult> UpdateEvent(
             Guid id, 
             [FromBody] EventForUpdateDto eventDto,
@@ -64,14 +66,16 @@ namespace EventsWebApp.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpPost("{id:guid}/image")] 
+        [HttpPost("{id:guid}/image")]
+        [Authorize(Policy = "AdministratorOnly")]
         public async Task<IActionResult> UploadEventImage(Guid id, [FromForm] FileUploadDto model, CancellationToken cancellationToken)
         {
-            await _service.EventService.UploadImageAsync(id, trackChanges: true, model.File, cancellationToken);
+            await _service.EventService.UploadImageAsync(id, trackChanges: true, model.File!, cancellationToken);
             return NoContent();
         }
 
         [HttpDelete("{id:guid}/image")]
+        [Authorize(Policy = "AdministratorOnly")]
         public async Task<IActionResult> DeleteEventImage(Guid id, CancellationToken cancellationToken)
         {
             await _service.EventService.DeleteImageAsync(id, trackChanges: true, cancellationToken);
@@ -79,6 +83,7 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpGet("{id:guid}/image")]
+        [Authorize(Policy = "AdministratorOnly")]
         public async Task<IActionResult> GetEventImage(Guid id, CancellationToken cancellationToken)
         {
             var image = await _service.EventService.GetImageAsync(id, trackChanges: false, cancellationToken);

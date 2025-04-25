@@ -96,10 +96,10 @@ internal sealed class EventService : IEventService
 
     private async Task<Event> GetEventAndCheckIfItExists(Guid id, bool trackChanges, CancellationToken cancellationToken)
     {
-        var userTask = await _repository.Event.GetEventByIdAsync(id, trackChanges, cancellationToken);
-        if (userTask is null)
+        var eventEntity = await _repository.Event.GetEventByIdAsync(id, trackChanges, cancellationToken);
+        if (eventEntity is null)
             throw new EventByIdNotFoundException(id);
-        return userTask;
+        return eventEntity;
     }
 
     public async Task UploadImageAsync(
