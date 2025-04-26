@@ -31,6 +31,7 @@ public class EventRepository : RepositoryBase<Event>, IEventRepository
                                 eventParameters.Category
                             )
                             .Search(eventParameters.SearchTerm!)
+                            .OrderBy(x => x.Name)
                             .Include(e => e.UserEvents)
                             .ToPagedListAsync(
                                 eventParameters.PageNumber, 

@@ -12,6 +12,7 @@ using EventsWebApp.Application.Exceptions;
 using EventsWebApp.Domain.Models;
 using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace EventsWebApp.Application.Service;
 
@@ -20,12 +21,18 @@ internal sealed class EventService : IEventService
     private readonly IRepositoryManager _repository;
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
+    private readonly IEmailService _emailService;
 
-    public EventService(IRepositoryManager repository, IMapper mapper, IFileService fileService)
+    public EventService(
+        IRepositoryManager repository, 
+        IMapper mapper, 
+        IFileService fileService,
+        IEmailService emailService)
     {
         _repository = repository;
         _mapper = mapper;
         _fileService = fileService;
+        _emailService = emailService;
     }
 
     public async Task<(IEnumerable<EventDto> events, MetaData metaData)> GetAllEventAsync(
@@ -88,10 +95,59 @@ internal sealed class EventService : IEventService
         CancellationToken cancellationToken)
     {
         var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
+        bool startDateTimeOrLocationChanged =
+            !eventEntity.StartDateTime.Equals(eventForUpdateDto.StartDateTime) ||
+            !eventEntity.Location.Equals(eventForUpdateDto.Location);
 
         _mapper.Map(eventForUpdateDto, eventEntity);
 
         await _repository.SaveAsync(cancellationToken);
+
+        if (startDateTimeOrLocationChanged)
+        {
+            await SendNotificationAboutUpdateEventAsync(eventEntity, cancellationToken);
+        }
+    }
+
+    private async Task SendNotificationAboutUpdateEventAsync(Event eventEntity, CancellationToken cancellationToken)
+    {
+        var users = await _repository.User.GetParticipantUsersByEventAsync(
+                eventEntity.Id,
+                new UserParameters { },
+                trackChanges: false,
+                cancellationToken);
+
+        if (users.Any())
+        {
+            string emailBody = GenerateEventUpdateEmailBody(eventEntity);
+
+            var userEmails = users.Select(u => u.Email).Where(email => !string.IsNullOrEmpty(email));
+            if (userEmails.Count() != 0)
+            {
+                await _emailService.SendEmailToManyAsync(
+                userEmails!,
+                subject: "Event Details Updated",
+                emailBody);
+            }
+        }
+    }
+
+    private string GenerateEventUpdateEmailBody(Event eventEntity)
+    {
+        return $@"
+        <html>
+        <body>
+            <h1>Event Details Updated</h1>
+            <p>Hello!</p>
+            <p>The details of the event <strong>{eventEntity.Name}</strong> have been updated:</p>
+            <ul>
+                <li><strong>Start Date:</strong> {eventEntity.StartDateTime:g}</li>
+                <li><strong>Location:</strong> {eventEntity.Location}</li>
+            </ul>
+            <p>Please review the updated details and adjust your plans accordingly.</p>
+            <p>Thank you!</p>
+        </body>
+        </html>";
     }
 
     private async Task<Event> GetEventAndCheckIfItExists(Guid id, bool trackChanges, CancellationToken cancellationToken)

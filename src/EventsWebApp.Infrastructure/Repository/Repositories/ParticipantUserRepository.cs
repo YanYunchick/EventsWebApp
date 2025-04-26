@@ -25,6 +25,7 @@ public class ParticipantUserRepository : RepositoryBase<User>, IParticipantUserR
         CancellationToken cancellationToken)
     {
         return await FindByCondition(u => u.UserEvents.Any(ue => ue.EventId.Equals(eventId)), trackChanges)
+            .OrderBy(u => u.UserName)
             .Include(u => u.UserEvents.Where(ue => ue.EventId.Equals(eventId)))
             .ToPagedListAsync(userParameters.PageNumber,
                                 userParameters.PageSize,

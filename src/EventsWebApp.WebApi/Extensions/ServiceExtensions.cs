@@ -132,5 +132,17 @@ namespace EventsWebApp.WebApi.Extensions
 
             services.AddScoped<IValidator<UserForRegistrationDto>, UserForRegistrationDtoValidator>();
         }
+
+        public static void ConfigureFluentEmail(this IServiceCollection services, IConfiguration configuration)
+        {
+            var smtpSettings = configuration.GetSection("SmtpSettings");
+            var password = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+
+            services.AddFluentEmail(smtpSettings.GetSection("From").Value)
+                .AddSmtpSender(smtpSettings.GetSection("SmtpServer").Value,
+                               Convert.ToInt32(smtpSettings.GetSection("Port").Value),
+                               smtpSettings.GetSection("UserName").Value,
+                               password);
+        }
     }
 }

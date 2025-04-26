@@ -24,9 +24,11 @@ public sealed class ServiceManager : IServiceManager
         IMapper mapper,
         IFileService fileService,
         UserManager<User> userManager,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IEmailService emailService)
     {
-        _eventService = new Lazy<IEventService>(() => new EventService(repositoryManager, mapper, fileService));
+        _eventService = new Lazy<IEventService>(() => 
+        new EventService(repositoryManager, mapper, fileService, emailService));
         _userService = new Lazy<IParticipantUserService>(() => 
             new ParticipantUserService(repositoryManager, userManager, mapper));
         _authenticationService = new Lazy<IAuthenticationService>(() =>

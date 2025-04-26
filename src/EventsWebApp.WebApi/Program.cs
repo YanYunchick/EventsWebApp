@@ -1,3 +1,4 @@
+using EventsWebApp.Application.Contracts;
 using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Infrastructure;
 using EventsWebApp.WebApi.ActionFilters;
@@ -29,6 +30,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 builder.Services.ConfigureFluentValidators();
 builder.Services.AddScoped(typeof(ValidationFilterAttribute<>));
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.ConfigureFluentEmail(builder.Configuration);
 
 
 var app = builder.Build();
