@@ -2,7 +2,7 @@
 
 namespace EventsWebApp.Application.DTOs.File;
 
-public record FileUploadDto
+public record ImageUploadDto
 {
-    public IFormFile? File { get; set; }
+    public IFormFile? Image { get; set; }
 }

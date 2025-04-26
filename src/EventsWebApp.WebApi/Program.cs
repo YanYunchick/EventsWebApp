@@ -1,6 +1,8 @@
 using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Infrastructure;
+using EventsWebApp.WebApi.ActionFilters;
 using EventsWebApp.WebApi.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
@@ -21,6 +23,13 @@ builder.Services.ConfigureAuthorizationPolicies();
 
 builder.Services.AddControllers();
 builder.Services.ConfigureSwaggerGen();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+builder.Services.ConfigureFluentValidators();
+builder.Services.AddScoped(typeof(ValidationFilterAttribute<>));
+
 
 var app = builder.Build();
 

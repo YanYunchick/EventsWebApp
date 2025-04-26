@@ -8,7 +8,7 @@ using AutoMapper;
 using EventsWebApp.Application.Contracts;
 using EventsWebApp.Application.DTOs.Event;
 using EventsWebApp.Domain.Contracts;
-using EventsWebApp.Domain.Exceptions;
+using EventsWebApp.Application.Exceptions;
 using EventsWebApp.Domain.Models;
 using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Http;
@@ -60,7 +60,7 @@ internal sealed class EventService : IEventService
         return eventDto;
     }
 
-    public async Task<EventDto> CreateEventAsync(EventForCreationDto eventDto, CancellationToken cancellationToken)
+    public async Task<EventDto> CreateEventAsync(EventForManipulationDto eventDto, CancellationToken cancellationToken)
     {
         var eventEntity = _mapper.Map<Event>(eventDto);
 
@@ -83,7 +83,7 @@ internal sealed class EventService : IEventService
 
     public async Task UpdateEventAsync(
         Guid eventId, 
-        EventForUpdateDto eventForUpdateDto,
+        EventForManipulationDto eventForUpdateDto,
         bool trackChanges, 
         CancellationToken cancellationToken)
     {

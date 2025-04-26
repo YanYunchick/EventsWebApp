@@ -18,12 +18,12 @@ public interface IEventService
 
     Task<EventDto> GetEventByIdAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken);
     Task<EventDto> GetEventByNameAsync(string name, bool trackChanges, CancellationToken cancellationToken);
-    Task<EventDto> CreateEventAsync(EventForCreationDto eventDto, CancellationToken cancellationToken);
+    Task<EventDto> CreateEventAsync(EventForManipulationDto eventDto, CancellationToken cancellationToken);
     Task DeleteEventAsync(Guid eventId, bool trackChanges, CancellationToken cancellationToken);
 
     Task UpdateEventAsync(
         Guid eventId,
-        EventForUpdateDto eventForUpdateDto,
+        EventForManipulationDto eventForUpdateDto,
         bool trackChanges,
         CancellationToken cancellationToken);
 

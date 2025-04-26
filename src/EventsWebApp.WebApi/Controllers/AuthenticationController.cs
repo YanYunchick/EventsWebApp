@@ -1,5 +1,6 @@
 ﻿using EventsWebApp.Application.Contracts;
 using EventsWebApp.Application.DTOs.User;
+using EventsWebApp.WebApi.ActionFilters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilterAttribute<UserForRegistrationDto>))]
     public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
     {
         var result = await _service.AuthenticationService.RegisterUser(userForRegistration);

@@ -1,9 +1,16 @@
 ﻿using System.Text;
 using EventsWebApp.Application.Contracts;
+using EventsWebApp.Application.DTOs.Event;
+using EventsWebApp.Application.DTOs.File;
+using EventsWebApp.Application.DTOs.User;
 using EventsWebApp.Application.Service;
+using EventsWebApp.Application.Validation.EventValidators;
+using EventsWebApp.Application.Validation.FileValidators;
+using EventsWebApp.Application.Validation.UserValidators;
 using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Domain.Models;
 using EventsWebApp.Infrastructure.Repository;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -116,5 +123,14 @@ namespace EventsWebApp.WebApi.Extensions
                     }
                 });
             });
+
+        public static void ConfigureFluentValidators(this IServiceCollection services)
+        {
+            services.AddScoped<IValidator<EventForManipulationDto>, EventForManipulationDtoValidator>();
+
+            services.AddScoped<IValidator<ImageUploadDto>, ImageUploadDtoValidator>();
+
+            services.AddScoped<IValidator<UserForRegistrationDto>, UserForRegistrationDtoValidator>();
+        }
     }
 }

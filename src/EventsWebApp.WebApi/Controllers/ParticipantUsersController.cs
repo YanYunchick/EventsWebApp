@@ -5,6 +5,7 @@ using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace EventsWebApp.WebApi.Controllers;
 
@@ -28,23 +29,23 @@ public class ParticipantUsersController : ControllerBase
         return Ok(participant);
     }
 
-    [HttpGet("event/{id:guid}")]
+    [HttpGet("event/{eventId:guid}")]
     [Authorize(Policy = "AdministratorOnly")]
     public async Task<IActionResult> GetParticipantUsersByEvent(
-            Guid id,
+            Guid eventId,
             [FromQuery] UserParameters userParameters,
             CancellationToken cancellationToken)
     {
         var pagedResult = await _service.ParticipantUserService
-            .GetParticipantUsersByEventAsync(id, userParameters, trackChanges: false, cancellationToken);
+            .GetParticipantUsersByEventAsync(eventId, userParameters, trackChanges: false, cancellationToken);
 
         Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
         return Ok(pagedResult.participantUsers);
     }
 
-    [HttpPost("event/")]
+    [HttpPost("EventSubscription/{eventId:guid}")]
     [Authorize(Policy = "Authenticated")]
-    public async Task<IActionResult> SubscribeOnEvent([FromBody]Guid eventId, CancellationToken cancellationToken)
+    public async Task<IActionResult> SubscribeOnEvent(Guid eventId, CancellationToken cancellationToken)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         await _service.ParticipantUserService.CreateUserEventAsync(userId!, eventId, trackChanges: false, cancellationToken);
@@ -52,9 +53,9 @@ public class ParticipantUsersController : ControllerBase
         return Created();
     }
 
-    [HttpDelete("event/")]
+    [HttpDelete("EventSubscription/{eventId:guid}")]
     [Authorize(Policy = "Authenticated")]
-    public async Task<IActionResult> UnsubscribeOnEvent([FromBody] Guid eventId, CancellationToken cancellationToken)
+    public async Task<IActionResult> UnsubscribeOnEvent(Guid eventId, CancellationToken cancellationToken)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         await _service.ParticipantUserService.DeleteUserEventAsync(userId!, eventId, trackChanges: false, cancellationToken);

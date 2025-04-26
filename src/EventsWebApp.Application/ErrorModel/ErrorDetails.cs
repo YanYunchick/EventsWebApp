@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace EventsWebApp.Domain.ErrorModel;
+namespace EventsWebApp.Application.ErrorModel;
 
 public class ErrorDetails
 {

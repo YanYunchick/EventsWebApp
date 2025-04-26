@@ -7,7 +7,7 @@ using AutoMapper;
 using EventsWebApp.Application.Contracts;
 using EventsWebApp.Application.DTOs.User;
 using EventsWebApp.Domain.Contracts;
-using EventsWebApp.Domain.Exceptions;
+using EventsWebApp.Application.Exceptions;
 using EventsWebApp.Domain.Models;
 using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Identity;

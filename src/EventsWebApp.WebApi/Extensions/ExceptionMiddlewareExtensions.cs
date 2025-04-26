@@ -1,5 +1,5 @@
-﻿using EventsWebApp.Domain.ErrorModel;
-using EventsWebApp.Domain.Exceptions;
+﻿using EventsWebApp.Application.ErrorModel;
+using EventsWebApp.Application.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 

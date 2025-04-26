@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace EventsWebApp.Application.DTOs.Event;
 
-public abstract record EventForManipulationDto
+public record EventForManipulationDto
 {
     public string? Name { get; init; }
     public string? Description { get; init; }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EventsWebApp.Domain.Contracts;
-using EventsWebApp.Domain.Exceptions;
+using EventsWebApp.Application.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
@@ -57,7 +57,7 @@ public class FileService : IFileService
 
         if (!File.Exists(fileNameWithPath))
         {
-            throw new Domain.Exceptions.FileNotFoundException("File doesn't exist.");
+            throw new Application.Exceptions.FileNotFoundException("File doesn't exist.");
         }
         File.Delete(fileNameWithPath);
     }
@@ -65,12 +65,12 @@ public class FileService : IFileService
     public async Task<(byte[] fileBytes, string contentType, string filename)> GetFileAsync(string fileName)
     {
         if (string.IsNullOrEmpty(fileName))
-            throw new Domain.Exceptions.FileNotFoundException(fileName);
+            throw new Application.Exceptions.FileNotFoundException(fileName);
 
         var filePath = Path.Combine(_filePath, fileName);
 
         if (!File.Exists(filePath))
-            throw new Domain.Exceptions.FileNotFoundException(filePath);
+            throw new Application.Exceptions.FileNotFoundException(filePath);
 
         var fileBytes = await File.ReadAllBytesAsync(filePath);
         var contentType = $"file/{Path.GetExtension(fileName).TrimStart('.').ToLowerInvariant()}";

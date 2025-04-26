@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EventsWebApp.Application.Contracts;
 using EventsWebApp.Application.DTOs.User;
-using EventsWebApp.Domain.Exceptions;
+using EventsWebApp.Application.Exceptions;
 using EventsWebApp.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;

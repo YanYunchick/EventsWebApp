@@ -3,6 +3,7 @@ using EventsWebApp.Application.Contracts;
 using EventsWebApp.Application.DTOs.Event;
 using EventsWebApp.Application.DTOs.File;
 using EventsWebApp.Domain.RequestFeatures;
+using EventsWebApp.WebApi.ActionFilters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +41,8 @@ namespace EventsWebApp.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = "AdministratorOnly")]
-        public async Task<IActionResult> CreateEvent([FromBody] EventForCreationDto eventDto,
+        [ServiceFilter(typeof(ValidationFilterAttribute<EventForManipulationDto>))]
+        public async Task<IActionResult> CreateEvent([FromBody] EventForManipulationDto eventDto,
         CancellationToken cancellationToken)
         {
             var createdEvent = await _service.EventService.CreateEventAsync(eventDto, cancellationToken);
@@ -57,9 +59,10 @@ namespace EventsWebApp.WebApi.Controllers
 
         [HttpPut("{id:guid}")]
         [Authorize(Policy = "AdministratorOnly")]
+        [ServiceFilter(typeof(ValidationFilterAttribute<EventForManipulationDto>))]
         public async Task<IActionResult> UpdateEvent(
             Guid id, 
-            [FromBody] EventForUpdateDto eventDto,
+            [FromBody] EventForManipulationDto eventDto,
             CancellationToken cancellationToken)
         {
             await _service.EventService.UpdateEventAsync(id, eventDto, trackChanges: true, cancellationToken);
@@ -68,9 +71,10 @@ namespace EventsWebApp.WebApi.Controllers
 
         [HttpPost("{id:guid}/image")]
         [Authorize(Policy = "AdministratorOnly")]
-        public async Task<IActionResult> UploadEventImage(Guid id, [FromForm] FileUploadDto model, CancellationToken cancellationToken)
+        [ServiceFilter(typeof(ValidationFilterAttribute<ImageUploadDto>))]
+        public async Task<IActionResult> UploadEventImage(Guid id, [FromForm] ImageUploadDto model, CancellationToken cancellationToken)
         {
-            await _service.EventService.UploadImageAsync(id, trackChanges: true, model.File!, cancellationToken);
+            await _service.EventService.UploadImageAsync(id, trackChanges: true, model.Image!, cancellationToken);
             return NoContent();
         }
 
