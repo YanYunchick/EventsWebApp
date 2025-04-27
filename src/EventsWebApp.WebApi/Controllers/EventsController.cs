@@ -87,7 +87,6 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpGet("{id:guid}/image")]
-        [Authorize(Policy = "AdministratorOnly")]
         public async Task<IActionResult> GetEventImage(Guid id, CancellationToken cancellationToken)
         {
             var image = await _service.EventService.GetImageAsync(id, trackChanges: false, cancellationToken);
