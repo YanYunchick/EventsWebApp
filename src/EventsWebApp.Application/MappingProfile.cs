@@ -15,7 +15,6 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<Event, EventDto>();
-        CreateMap<EventForManipulationDto, Event>();
         CreateMap<EventForManipulationDto, Event>().ReverseMap();
 
         CreateMap<UserForRegistrationDto, User>();

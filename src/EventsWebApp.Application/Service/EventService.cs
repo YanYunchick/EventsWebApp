@@ -13,7 +13,9 @@ using EventsWebApp.Domain.Models;
 using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Tests")]
 namespace EventsWebApp.Application.Service;
 
 internal sealed class EventService : IEventService
