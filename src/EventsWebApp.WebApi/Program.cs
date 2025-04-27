@@ -32,7 +32,7 @@ builder.Services.ConfigureFluentValidators();
 builder.Services.AddScoped(typeof(ValidationFilterAttribute<>));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.ConfigureFluentEmail(builder.Configuration);
-
+builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
@@ -53,6 +53,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseCors("CorsPolicy");
+app.UseResponseCaching();
 app.UseAuthorization();
 app.MapControllers();
 

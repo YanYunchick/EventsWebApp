@@ -87,6 +87,7 @@ namespace EventsWebApp.WebApi.Controllers
         }
 
         [HttpGet("{id:guid}/image")]
+        [ResponseCache(Duration = 120)]
         public async Task<IActionResult> GetEventImage(Guid id, CancellationToken cancellationToken)
         {
             var image = await _service.EventService.GetImageAsync(id, trackChanges: false, cancellationToken);
