@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  eventswebapp.webapi:
+    image: ${DOCKER_REGISTRY-}eventswebappwebapi
+    build:
+      context: .
+      dockerfile: src/EventsWebApp.WebApi/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081" 
+    container_name: events_web_app
+    environment:
+      SECRET: "YYSecretKeyYYSecretKeyYYSecretKey"
+      SMTP_PASSWORD: "kagmpshizrsnzbke"
+    depends_on:
+      - db
+  db:
+    image: mcr.microsoft.com/mssql/server:latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YYPassw0rd$"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+volumes:
+  sqlserverdata:

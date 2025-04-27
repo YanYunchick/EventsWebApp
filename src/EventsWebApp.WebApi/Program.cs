@@ -1,9 +1,11 @@
 using EventsWebApp.Application.Contracts;
 using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Infrastructure;
+using EventsWebApp.Infrastructure.Repository;
 using EventsWebApp.WebApi.ActionFilters;
 using EventsWebApp.WebApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
@@ -35,6 +37,12 @@ builder.Services.ConfigureFluentEmail(builder.Configuration);
 builder.Services.AddResponseCaching();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<RepositoryContext>();
+    dbContext.Database.Migrate();
+}
 
 if (app.Environment.IsDevelopment())
 {
