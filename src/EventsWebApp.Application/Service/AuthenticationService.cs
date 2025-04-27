@@ -47,9 +47,9 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<bool> ValidateUser(UserForAuthenticationDto userForAuth)
     {
-        _user = await _userManager.FindByNameAsync(userForAuth.UserName);
+        _user = await _userManager.FindByNameAsync(userForAuth.UserName!);
 
-        var result = (_user != null && await _userManager.CheckPasswordAsync(_user, userForAuth.Password));
+        var result = (_user != null && await _userManager.CheckPasswordAsync(_user, userForAuth.Password!));
 
         return result;
     }
@@ -62,7 +62,7 @@ public class AuthenticationService : IAuthenticationService
 
         var refreshToken = GenerateRefreshToken();
 
-        _user.RefreshToken = refreshToken;
+        _user!.RefreshToken = refreshToken;
 
         if (populateExp)
             _user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
@@ -79,7 +79,7 @@ public class AuthenticationService : IAuthenticationService
     {
         var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
 
-        var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+        var user = await _userManager.FindByNameAsync(principal.Identity!.Name!);
         if (user == null || user.RefreshToken != tokenDto.RefreshToken ||
             user.RefreshTokenExpiryTime <= DateTime.Now)
             throw new RefreshTokenBadRequest();
@@ -91,7 +91,7 @@ public class AuthenticationService : IAuthenticationService
 
     private SigningCredentials GetSigningCredentials()
     {
-        var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"));
+        var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET")!);
         var secret = new SymmetricSecurityKey(key);
 
         return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -101,7 +101,7 @@ public class AuthenticationService : IAuthenticationService
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, _user.UserName),
+            new Claim(ClaimTypes.Name, _user!.UserName!),
             new Claim(ClaimTypes.NameIdentifier, _user.Id)
         };
 
@@ -147,7 +147,7 @@ public class AuthenticationService : IAuthenticationService
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"))),
+                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET")!)),
             ValidateLifetime = true,
             ValidIssuer = jwtSettings["validIssuer"],
             ValidAudience = jwtSettings["validAudience"]

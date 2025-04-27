@@ -31,7 +31,7 @@ public class RepositoryManager : IRepositoryManager
     }
 
     public IEventRepository Event => _eventRepository.Value;
-    public IParticipantUserRepository User => _participantUserRepository.Value;
+    public IParticipantUserRepository ParticipantUser => _participantUserRepository.Value;
     public IUserEventRepository UserEvent => _userEventRepository.Value;
 
     public async Task SaveAsync(CancellationToken cancellationToken) => 

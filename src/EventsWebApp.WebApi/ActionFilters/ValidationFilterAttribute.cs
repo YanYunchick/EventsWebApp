@@ -28,7 +28,7 @@ public class ValidationFilterAttribute<T> : IAsyncActionFilter where T : class
         if (dtoValue is not T model)
         {
             context.Result = new BadRequestObjectResult(
-                $"Model type {dtoValue.GetType().Name} does not match with type {typeof(T).Name}. " +
+                $"Model type {dtoValue!.GetType().Name} does not match with type {typeof(T).Name}. " +
                 $"Controller: {controller}, action: {action}");
 
             return;

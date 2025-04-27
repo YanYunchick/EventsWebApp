@@ -267,7 +267,7 @@ public class EventServiceTests
                 eventEntity.MaxParticipants = updateDto.MaxParticipants;
             });
 
-        _mockRepository.Setup(repo => repo.User.GetParticipantUsersByEventAsync(
+        _mockRepository.Setup(repo => repo.ParticipantUser.GetParticipantUsersByEventAsync(
             eventId, It.IsAny<UserParameters>(), false, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pagedUsers);
 

@@ -35,7 +35,7 @@ internal sealed class ParticipantUserService : IParticipantUserService
     {
         var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
 
-        var usersWithMetaData = await _repository.User.GetParticipantUsersByEventAsync(eventId, userParameters, trackChanges, cancellationToken);
+        var usersWithMetaData = await _repository.ParticipantUser.GetParticipantUsersByEventAsync(eventId, userParameters, trackChanges, cancellationToken);
 
         var participantUsersDto = _mapper.Map<IEnumerable<ParticipantUserDto>>(usersWithMetaData);
 
@@ -50,7 +50,7 @@ internal sealed class ParticipantUserService : IParticipantUserService
     {
         var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
 
-        var user = await _repository.User.GetParticipantUserByIdsAsync(userId, eventId, trackChanges, cancellationToken);
+        var user = await _repository.ParticipantUser.GetParticipantUserByIdsAsync(userId, eventId, trackChanges, cancellationToken);
         if (user == null)
         {
             throw new UserNotFoundException(userId);

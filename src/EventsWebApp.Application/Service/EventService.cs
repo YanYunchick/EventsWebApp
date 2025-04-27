@@ -113,7 +113,7 @@ internal sealed class EventService : IEventService
 
     private async Task SendNotificationAboutUpdateEventAsync(Event eventEntity, CancellationToken cancellationToken)
     {
-        var users = await _repository.User.GetParticipantUsersByEventAsync(
+        var users = await _repository.ParticipantUser.GetParticipantUsersByEventAsync(
                 eventEntity.Id,
                 new UserParameters { },
                 trackChanges: false,

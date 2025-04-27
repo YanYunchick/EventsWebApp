@@ -10,7 +10,7 @@ namespace EventsWebApp.Domain.Contracts;
 public interface IRepositoryManager
 {
     IEventRepository Event { get; }
-    IParticipantUserRepository User { get; }
+    IParticipantUserRepository ParticipantUser { get; }
     IUserEventRepository UserEvent { get; }
 
     Task SaveAsync(CancellationToken cancellationToken);
