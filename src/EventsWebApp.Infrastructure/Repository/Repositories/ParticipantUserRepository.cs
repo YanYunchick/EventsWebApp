@@ -38,7 +38,8 @@ public class ParticipantUserRepository : RepositoryBase<User>, IParticipantUserR
         bool trackChanges,
         CancellationToken cancellationToken)
     {
-        return await FindByCondition(u => u.Id.Equals(userId), trackChanges)
+        return await FindByCondition(u => u.Id.Equals(userId) 
+            && u.UserEvents.Any(ue => ue.EventId == eventId), trackChanges)
             .Include(u => u.UserEvents.Where(ue => ue.EventId.Equals(eventId)))
             .SingleOrDefaultAsync(cancellationToken);
     }

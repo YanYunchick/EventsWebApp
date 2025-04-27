@@ -48,18 +48,16 @@ public class FileService : IFileService
 
     public void DeleteFile(string fileNameWithExtension)
     {
-        if (string.IsNullOrEmpty(fileNameWithExtension))
+        var fileNameWithPath = string.Empty;
+        if (!string.IsNullOrEmpty(fileNameWithExtension))
         {
-            throw new FileBadRequestException("File doesn't exist.");
+            fileNameWithPath = Path.Combine(_filePath, fileNameWithExtension);
         }
 
-        var fileNameWithPath = Path.Combine(_filePath, fileNameWithExtension);
-
-        if (!File.Exists(fileNameWithPath))
+        if (File.Exists(fileNameWithPath))
         {
-            throw new Application.Exceptions.FileNotFoundException("File doesn't exist.");
+            File.Delete(fileNameWithPath);
         }
-        File.Delete(fileNameWithPath);
     }
 
     public async Task<(byte[] fileBytes, string contentType, string filename)> GetFileAsync(string fileName)

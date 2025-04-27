@@ -53,7 +53,7 @@ internal sealed class ParticipantUserService : IParticipantUserService
         var user = await _repository.ParticipantUser.GetParticipantUserByIdsAsync(userId, eventId, trackChanges, cancellationToken);
         if (user == null)
         {
-            throw new UserNotFoundException(userId);
+            throw new UserEventNotFoundException(userId, eventId);
         }
 
         var participantUserDto = _mapper.Map<ParticipantUserDto>(user);

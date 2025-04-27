@@ -21,8 +21,9 @@ public class MappingProfile : Profile
 
         CreateMap<User, ParticipantUserDto>()
             .ForMember(destination => destination.RegistrationDate,
-                opts => opts
-                    .MapFrom(src => src.UserEvents.First().RegistrationDate));
+                opts => opts.MapFrom(src => src.UserEvents.Any()
+                    ? src.UserEvents.First().RegistrationDate
+                    : DateTime.MinValue));
 
     }
 }
