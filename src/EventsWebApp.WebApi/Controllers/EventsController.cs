@@ -39,6 +39,13 @@ namespace EventsWebApp.WebApi.Controllers
             return Ok(eventDto);
         }
 
+        [HttpGet("{name}")]
+        public async Task<IActionResult> GetEventByName(string name, CancellationToken cancellationToken)
+        {
+            var eventDto = await _service.EventService.GetEventByNameAsync(name, trackChanges: false, cancellationToken);
+            return Ok(eventDto);
+        }
+
         [HttpPost]
         [Authorize(Policy = "AdministratorOnly")]
         [ServiceFilter(typeof(ValidationFilterAttribute<EventForManipulationDto>))]
