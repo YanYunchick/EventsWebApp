@@ -77,6 +77,10 @@ internal sealed class EventService : IEventService
     {
         var eventEntity = _mapper.Map<Event>(eventDto);
 
+        var existedEventEntity = await _repository.Event.GetEventByNameAsync(eventEntity.Name, trackChanges: false , cancellationToken);
+        if (existedEventEntity is not null)
+            throw new EventAlreadyExistsBadRequestException(existedEventEntity.Name);
+
         _repository.Event.CreateEvent(eventEntity);
         await _repository.SaveAsync(cancellationToken);
 
@@ -100,18 +104,23 @@ internal sealed class EventService : IEventService
         bool trackChanges, 
         CancellationToken cancellationToken)
     {
-        var eventEntity = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
-        bool startDateTimeOrLocationChanged =
-            !eventEntity.StartDateTime.Equals(eventForUpdateDto.StartDateTime) ||
-            !eventEntity.Location.Equals(eventForUpdateDto.Location);
+        var eventEntityToUpdate = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
 
-        _mapper.Map(eventForUpdateDto, eventEntity);
+        var existedEventEntityByName = await _repository.Event.GetEventByNameAsync(eventForUpdateDto.Name!, trackChanges: false, cancellationToken);
+        if (existedEventEntityByName is not null && existedEventEntityByName.Id != eventEntityToUpdate.Id)
+            throw new EventAlreadyExistsBadRequestException(existedEventEntityByName.Name);
+
+        bool startDateTimeOrLocationChanged =
+            !eventEntityToUpdate.StartDateTime.Equals(eventForUpdateDto.StartDateTime) ||
+            !eventEntityToUpdate.Location.Equals(eventForUpdateDto.Location);
+
+        _mapper.Map(eventForUpdateDto, eventEntityToUpdate);
 
         await _repository.SaveAsync(cancellationToken);
 
         if (startDateTimeOrLocationChanged)
         {
-            await SendNotificationAboutUpdateEventAsync(eventEntity, cancellationToken);
+            await SendNotificationAboutUpdateEventAsync(eventEntityToUpdate, cancellationToken);
         }
     }
 
