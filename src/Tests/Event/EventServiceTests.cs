@@ -12,6 +12,7 @@ using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Domain.Models;
 using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Models = EventsWebApp.Domain.Models;
 
@@ -23,6 +24,7 @@ public class EventServiceTests
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<IFileService> _mockFileService;
     private readonly Mock<IEmailService> _mockEmailService;
+    private readonly Mock<IMemoryCache> _mockMemoryCache;
     private readonly EventService _eventService;
 
     public EventServiceTests()
@@ -31,12 +33,14 @@ public class EventServiceTests
         _mockMapper = new Mock<IMapper>();
         _mockFileService = new Mock<IFileService>();
         _mockEmailService = new Mock<IEmailService>();
+        _mockMemoryCache = new Mock<IMemoryCache>();
 
         _eventService = new EventService(
             _mockRepository.Object,
             _mockMapper.Object,
             _mockFileService.Object,
-            _mockEmailService.Object);
+            _mockEmailService.Object,
+            _mockMemoryCache.Object);
     }
 
     [Fact]
@@ -339,6 +343,7 @@ public class EventServiceTests
         var imagePath = "test_image.png";
         var fileBytes = new byte[] { 0x01, 0x02, 0x03 };
         var contentType = "image/png";
+        var mockCacheEntry = new Mock<ICacheEntry>();
 
         var eventEntity = new Models.Event
         {
@@ -352,6 +357,8 @@ public class EventServiceTests
         _mockFileService.Setup(fs => fs.GetFileAsync(imagePath))
             .ReturnsAsync((fileBytes, contentType, imagePath));
 
+        _mockMemoryCache.Setup(cache => cache.CreateEntry(It.IsAny<object>()))
+                .Returns(mockCacheEntry.Object);
         // Act
         var result = await _eventService.GetImageAsync(eventId, false, CancellationToken.None);
 
