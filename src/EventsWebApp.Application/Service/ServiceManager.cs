@@ -8,6 +8,7 @@ using EventsWebApp.Application.Contracts;
 using EventsWebApp.Domain.Contracts;
 using EventsWebApp.Domain.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -25,10 +26,11 @@ public sealed class ServiceManager : IServiceManager
         IFileService fileService,
         UserManager<User> userManager,
         IConfiguration configuration,
-        IEmailService emailService)
+        IEmailService emailService,
+        IMemoryCache memoryCache)
     {
         _eventService = new Lazy<IEventService>(() => 
-        new EventService(repositoryManager, mapper, fileService, emailService));
+            new EventService(repositoryManager, mapper, fileService, emailService, memoryCache));
         _userService = new Lazy<IParticipantUserService>(() => 
             new ParticipantUserService(repositoryManager, userManager, mapper));
         _authenticationService = new Lazy<IAuthenticationService>(() =>

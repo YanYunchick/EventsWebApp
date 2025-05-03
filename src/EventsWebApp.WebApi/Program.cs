@@ -34,7 +34,7 @@ builder.Services.ConfigureFluentValidators();
 builder.Services.AddScoped(typeof(ValidationFilterAttribute<>));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.ConfigureFluentEmail(builder.Configuration);
-builder.Services.AddResponseCaching();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

@@ -14,6 +14,7 @@ using EventsWebApp.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Caching.Memory;
 
 [assembly: InternalsVisibleTo("Tests")]
 namespace EventsWebApp.Application.Service;
@@ -24,17 +25,20 @@ internal sealed class EventService : IEventService
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
     private readonly IEmailService _emailService;
+    private readonly IMemoryCache _memoryCache;
 
     public EventService(
         IRepositoryManager repository, 
         IMapper mapper, 
         IFileService fileService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IMemoryCache memoryCache)
     {
         _repository = repository;
         _mapper = mapper;
         _fileService = fileService;
         _emailService = emailService;
+        _memoryCache = memoryCache;
     }
 
     public async Task<(IEnumerable<EventDto> events, MetaData metaData)> GetAllEventAsync(
@@ -189,6 +193,7 @@ internal sealed class EventService : IEventService
             {
                 _fileService.DeleteFile(oldFilePath);
             }
+            _memoryCache.Remove($"EventImage_{eventId}");
 
             await _repository.CommitTransactionAsync(transaction, cancellationToken);
 
@@ -214,6 +219,7 @@ internal sealed class EventService : IEventService
             await _repository.SaveAsync(cancellationToken);
 
             _fileService.DeleteFile(filePathToDelete!);
+            _memoryCache.Remove($"EventImage_{eventId}");
 
             await _repository.CommitTransactionAsync(transaction, cancellationToken);
         }
@@ -228,9 +234,20 @@ internal sealed class EventService : IEventService
     public async Task<(byte[] fileBytes, string contentType, string filename)> GetImageAsync(
         Guid eventId, bool trackChanges, CancellationToken cancellationToken)
     {
+        var cacheKey = $"EventImage_{eventId}";
+        if (_memoryCache.TryGetValue(cacheKey, out (byte[] fileBytes, string contentType, string filename) cachedResult))
+        {
+            return cachedResult;
+        }
         var imageEvent = await GetEventAndCheckIfItExists(eventId, trackChanges, cancellationToken);
 
         var (fileBytes, contentType, filename) = await _fileService.GetFileAsync(imageEvent.ImagePath!);
+
+        var cacheOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(10)) 
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(30)); 
+
+        _memoryCache.Set(cacheKey, (fileBytes, contentType, filename), cacheOptions);
 
         return (fileBytes, contentType, filename);
     }
