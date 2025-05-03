@@ -10,34 +10,51 @@ namespace EventsWebApp.Application.Validation.UserValidators;
 
 public class UserForRegistrationDtoValidator : AbstractValidator<UserForRegistrationDto>
 {
+    private const int MaxFirstNameLength = 100;
+    private const int MaxLastNameLength = 100;
+    private const int MinUserNameLength = 3;
+    private const int MaxUserNameLength = 255;
+    private const int MinPasswordLength = 10;
+
     public UserForRegistrationDtoValidator()
     {
         RuleFor(dto => dto.FirstName)
-            .NotEmpty().WithMessage("FirstName is required.")
-            .MaximumLength(100).WithMessage("FirstName must not exceed 100 characters.");
+            .NotEmpty()
+                .WithMessage(ValidationUtility.RequiredFieldMessage(nameof(UserForRegistrationDto.FirstName)))
+            .MaximumLength(MaxFirstNameLength)
+                .WithMessage(ValidationUtility.TooLongFieldMessage(nameof(UserForRegistrationDto.FirstName), MaxFirstNameLength));
 
         RuleFor(dto => dto.LastName)
-            .NotEmpty().WithMessage("LastName is required.")
-            .MaximumLength(100).WithMessage("LastName must not exceed 100 characters.");
+            .NotEmpty()
+                .WithMessage(ValidationUtility.RequiredFieldMessage(nameof(UserForRegistrationDto.LastName)))
+            .MaximumLength(MaxLastNameLength)
+                .WithMessage(ValidationUtility.TooLongFieldMessage(nameof(UserForRegistrationDto.LastName), MaxLastNameLength));
 
         RuleFor(dto => dto.UserName)
-            .NotEmpty().WithMessage("UserName is required.")
-            .MinimumLength(3).WithMessage("UserName must be at least 3 characters long.")
-            .MaximumLength(255).WithMessage("UserName must not exceed 255 characters.");
+            .NotEmpty()
+                .WithMessage(ValidationUtility.RequiredFieldMessage(nameof(UserForRegistrationDto.UserName)))
+            .MinimumLength(MinUserNameLength)
+                .WithMessage(ValidationUtility.TooShortFieldMessage(nameof(UserForRegistrationDto.UserName), MinUserNameLength))
+            .MaximumLength(MaxUserNameLength)
+                .WithMessage(ValidationUtility.TooLongFieldMessage(nameof(UserForRegistrationDto.UserName), MaxUserNameLength));
 
         RuleFor(dto => dto.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(10).WithMessage("Password must be at least 10 characters long.")
+            .NotEmpty()
+                .WithMessage(ValidationUtility.RequiredFieldMessage(nameof(UserForRegistrationDto.Password)))
+            .MinimumLength(MinPasswordLength)
+                .WithMessage(ValidationUtility.TooShortFieldMessage(nameof(UserForRegistrationDto.Password), MinPasswordLength))
             .Matches("[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
             .Matches("[a-z]").WithMessage("Password must contain at least one lowercase letter.")
             .Matches("[0-9]").WithMessage("Password must contain at least one digit.");
 
         RuleFor(dto => dto.Email)
-            .NotEmpty().WithMessage("Email is required.")
+            .NotEmpty()
+                .WithMessage(ValidationUtility.RequiredFieldMessage(nameof(UserForRegistrationDto.Email)))
             .EmailAddress().WithMessage("Invalid email format.");
 
         RuleFor(dto => dto.Birthdate)
-            .NotEmpty().WithMessage("Birthdate is required.")
+            .NotEmpty()
+                .WithMessage(ValidationUtility.RequiredFieldMessage(nameof(UserForRegistrationDto.Birthdate)))
             .Must(HasValidDate).WithMessage("Birthdate must be a valid date and in the past.");
     }
 
