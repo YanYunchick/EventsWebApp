@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EventsWebApp.Application.DTOs.User;
-using Microsoft.AspNetCore.Identity;
+using EventsWebApp.Domain.Models;
 
 namespace EventsWebApp.Application.Contracts;
 
-public interface IAuthenticationService
+public interface IJwtService
 {
-    Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration);
-    Task<TokenDto> Authenticate(UserForAuthenticationDto userForAuth);
+    Task<TokenDto> CreateToken(User user);
     Task<TokenDto> RefreshToken(TokenDto tokenDto);
 }

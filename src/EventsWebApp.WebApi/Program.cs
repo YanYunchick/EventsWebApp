@@ -33,6 +33,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.ConfigureFluentValidators();
 builder.Services.AddScoped(typeof(ValidationFilterAttribute<>));
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.ConfigureFluentEmail(builder.Configuration);
 builder.Services.AddMemoryCache();
 

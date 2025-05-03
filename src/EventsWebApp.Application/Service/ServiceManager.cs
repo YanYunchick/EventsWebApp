@@ -25,16 +25,16 @@ public sealed class ServiceManager : IServiceManager
         IMapper mapper,
         IFileService fileService,
         UserManager<User> userManager,
-        IConfiguration configuration,
         IEmailService emailService,
-        IMemoryCache memoryCache)
+        IMemoryCache memoryCache,
+        IJwtService jwtService)
     {
         _eventService = new Lazy<IEventService>(() => 
             new EventService(repositoryManager, mapper, fileService, emailService, memoryCache));
         _userService = new Lazy<IParticipantUserService>(() => 
             new ParticipantUserService(repositoryManager, userManager, mapper));
         _authenticationService = new Lazy<IAuthenticationService>(() =>
-            new AuthenticationService(mapper, userManager, configuration));
+            new AuthenticationService(mapper, userManager, jwtService));
     }
 
     public IEventService EventService => _eventService.Value;
