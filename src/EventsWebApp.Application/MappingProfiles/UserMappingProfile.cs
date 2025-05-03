@@ -4,26 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using EventsWebApp.Application.DTOs.Event;
 using EventsWebApp.Application.DTOs.User;
 using EventsWebApp.Domain.Models;
 
-namespace EventsWebApp.Application;
+namespace EventsWebApp.Application.MappingProfiles;
 
-public class MappingProfile : Profile
+public class UserMappingProfile : Profile
 {
-    public MappingProfile()
+    public UserMappingProfile()
     {
-        CreateMap<Event, EventDto>();
-        CreateMap<EventForManipulationDto, Event>().ReverseMap();
-
         CreateMap<UserForRegistrationDto, User>();
 
         CreateMap<User, ParticipantUserDto>()
-            .ForMember(destination => destination.RegistrationDate,
+            .ForMember(
+                destination => destination.RegistrationDate,
                 opts => opts.MapFrom(src => src.UserEvents.Any()
                     ? src.UserEvents.First().RegistrationDate
                     : DateTime.MinValue));
-
     }
 }

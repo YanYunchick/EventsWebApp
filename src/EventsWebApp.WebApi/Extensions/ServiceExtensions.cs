@@ -3,6 +3,7 @@ using EventsWebApp.Application.Contracts;
 using EventsWebApp.Application.DTOs.Event;
 using EventsWebApp.Application.DTOs.File;
 using EventsWebApp.Application.DTOs.User;
+using EventsWebApp.Application.MappingProfiles;
 using EventsWebApp.Application.Service;
 using EventsWebApp.Application.Validation.EventValidators;
 using EventsWebApp.Application.Validation.FileValidators;
@@ -41,7 +42,8 @@ namespace EventsWebApp.WebApi.Extensions
             services.AddDbContext<RepositoryContext>(opts => 
                 opts.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
         public static void ConfigureAutoMapper(this IServiceCollection services) =>
-            services.AddAutoMapper(typeof(EventsWebApp.Application.MappingProfile));
+            services.AddAutoMapper(typeof(EventMappingProfile),
+                                   typeof(UserMappingProfile));
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
