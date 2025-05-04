@@ -15,6 +15,8 @@ services:
       SMTP_PASSWORD: "kagmpshizrsnzbke"
     depends_on:
       - db
+    volumes:
+      - ./src/EventsWebApp.WebApi/wwwroot/files:/app/wwwroot/files
   db:
     image: mcr.microsoft.com/mssql/server:latest
     container_name: sqlserver
