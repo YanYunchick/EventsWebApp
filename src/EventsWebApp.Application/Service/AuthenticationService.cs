@@ -12,6 +12,7 @@ using EventsWebApp.Application.Exceptions;
 using EventsWebApp.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -40,9 +41,12 @@ public class AuthenticationService : IAuthenticationService
 
         var result = await _userManager.CreateAsync(user, userForRegistration.Password!);
 
-        if (result.Succeeded)
-            await _userManager.AddToRolesAsync(user, userForRegistration.Roles!);
-        
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => e.Description).ToList();
+            throw new RegistrationBadRequestException("User registration failed", errors);
+        }
+        await _userManager.AddToRolesAsync(user, userForRegistration.Roles!);
         return result;
     }
 

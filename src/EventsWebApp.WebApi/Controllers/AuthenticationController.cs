@@ -20,15 +20,7 @@ public class AuthenticationController : ControllerBase
     [ServiceFilter(typeof(ValidationFilterAttribute<UserForRegistrationDto>))]
     public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
     {
-        var result = await _service.AuthenticationService.RegisterUser(userForRegistration);
-        if (!result.Succeeded)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.TryAddModelError(error.Code, error.Description);
-            }
-            return BadRequest(ModelState);
-        }
+        await _service.AuthenticationService.RegisterUser(userForRegistration);
         return StatusCode(201);
     }
 

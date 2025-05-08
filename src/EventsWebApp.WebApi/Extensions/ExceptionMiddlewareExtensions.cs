@@ -30,7 +30,8 @@ public static class ExceptionMiddlewareExtensions
                     await context.Response.WriteAsync(new ErrorDetails()
                     {
                         StatusCode = context.Response.StatusCode,
-                        Message = contextFeature.Error.Message
+                        Message = contextFeature.Error.Message,
+                        Details = contextFeature.Error is RegistrationBadRequestException badRequest ? badRequest.Errors : null
                     }.ToString());
                 }
             }
